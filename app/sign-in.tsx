@@ -7,6 +7,7 @@ import { auth } from '@/functions/firebase';
 import useAuth from '@/hooks/useAuth';
 import { authStateEnum, loadingStateEnum } from '@/types';
 import { Redirect } from 'expo-router';
+import LoadingScreen from '@/components/LoadingScreen';
 
 export default function signIn() {
   const {width, height} = useWindowDimensions();
@@ -15,10 +16,7 @@ export default function signIn() {
 
   if (authState === authStateEnum.loading) {
     return (
-      <View style={{width, height, backgroundColor: "#ADEE8F", justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color="white"/>
-        <Text style={{marginTop: 5, color: "white", fontWeight: 'bold', fontSize: 25}}>Loading...</Text>
-      </View>
+      <LoadingScreen />
     )
   }
 
