@@ -2,9 +2,9 @@
 // Home page
 // Quy Duong Nguyen
 import { Image, StyleSheet, Platform, View, useWindowDimensions, Text } from 'react-native';
-
 import React, { useState } from 'react';
 import { TextInput } from 'react-native-gesture-handler';
+import { Text } from 'react-native';
 
 export default function HomeScreen() {
   const {width, height} = useWindowDimensions();
