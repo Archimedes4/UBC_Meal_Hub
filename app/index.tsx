@@ -1,9 +1,8 @@
 // UBC Meal Hub
 // Home page
 // Quy Duong Nguyen
-import { Image, StyleSheet, Platform, View, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, Platform, View, useWindowDimensions, Text } from 'react-native';
 
-import { ThemedText } from '@/components/ThemedText';
 import React, { useState } from 'react';
 import { TextInput } from 'react-native-gesture-handler';
 
@@ -17,8 +16,8 @@ export default function HomeScreen() {
                   justifyContent: 'space-between', padding: 16, 
                   width, height: height * 0.1, backgroundColor: "#CAE9BB"}}>
       <View> 
-        <ThemedText type = "default">Good Morning,</ThemedText>
-        <ThemedText type = "default">Andrew Mainella,</ThemedText> 
+        <Text>Good Morning,</Text>
+        <Text>Andrew Mainella,</Text> 
       </View>
       <Image
       source={require('@/assets/images/homelander.png')}
