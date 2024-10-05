@@ -2,49 +2,43 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+### Firebase Schema
 
-1. Install dependencies
+#### Ingredients
+ingredient_id: string
+name: string
+image: string
 
-   ```bash
-   npm install
-   ```
+#### Foods
+![Note]Rating is the rating_sum/rating_count
+food_id: string
+name: string
+rating_sum: number is the sum of sum(Itams/Stars/rating)
+rating_count: is the cound of count(Itams/Stars)
+hearts: string[] contains the uid of the users that have heated the food
+ingredients: string[] an array of ingrident_id 
+image: string (the id of the image) ONLY jpg
+date: number_Epoch
+restaurant_id: string
+category: string of type resturant category (see resturant categories)
 
-2. Start the app
+#### Itams/Stars
+![Note] when updating this run a transaction to also update rating_sum and rating_count.
+uid: string
+rating: number [1,5]
 
-   ```bash
-    npx expo start
-   ```
+sum(rating)
+count(Itams/Stars)
 
-In the output, you'll find options to open the app in a
+#### Resturants
+restaurant_id (should be a uid)
+pretty (something nice for url like Open_Kitchen)
+name
+image (the id of the image) ONLY jpg
+restaurant_categories: string[] // This array can only have things add to this.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+#### Users
+uid
+name
+email
+resturant_preference (resturant_id or "none")
