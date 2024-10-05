@@ -11,7 +11,7 @@ export default function GoogleProvider({
   children: ReactNode
 }) {
   return (
-    <GoogleOAuthProvider clientId='94813812988-uoomdutrt7tn4rraa3dpe9ni8ghuvi5m.apps.googleusercontent.com' >
+    <GoogleOAuthProvider clientId='641900113874-hbpu0luijn9s3sfnpbcb7vfjm5orvttk.apps.googleusercontent.com' >
       {children}
     </GoogleOAuthProvider>
   )

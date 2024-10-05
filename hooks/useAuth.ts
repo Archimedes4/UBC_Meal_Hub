@@ -5,14 +5,13 @@
 */
 
 import { auth } from "@/functions/firebase";
-import { loadingStateEnum } from "@/types";
+import { authStateEnum, loadingStateEnum } from "@/types";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 
 export default function useAuth() {
   const [user, setUser] = useState(null);
-  const [signedIn, setSignedIn] = useState(false);
-  const [loadingState, setLoadingState] = useState(loadingStateEnum.loading);
+  const [authState, setAuthState] = useState(authStateEnum.loading);
 
   useEffect(() => {
     // Check if the user is signed in
@@ -20,16 +19,16 @@ export default function useAuth() {
     // If they are not, set the user and signedIn state to null and false respectively
     const sub = onAuthStateChanged(auth, (data) => {
       if (data === null) {
-        setSignedIn(false)
+        console.log("No user signed in");
+        setAuthState(authStateEnum.noAuth)
       } else {
         setUser(null); // TODO get user data
-        setSignedIn(true);
+        setAuthState(authStateEnum.signedIn)
       }
-      setLoadingState(loadingStateEnum.success)
     })
 
     return () => sub();
   }, []);
 
-  return { user, signedIn, loadingState };
+  return { user, authState };
 }

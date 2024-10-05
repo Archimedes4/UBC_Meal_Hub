@@ -3,3 +3,9 @@ export enum loadingStateEnum {
   failed,
   success
 }
+
+export enum authStateEnum {
+  loading,
+  signedIn,
+  noAuth
+}
