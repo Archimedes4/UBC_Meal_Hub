@@ -28,11 +28,14 @@ export default function signIn() {
     <View style={{width, height, backgroundColor: "#ADEE8F"}}>
       <View style={{margin: 'auto'}}>
         <Text style={{fontFamily: "PorterSansBlock", fontSize: 50}}>UBC Menu Hub</Text>
+
         <View style={{width: Math.min(500, width), marginHorizontal: 'auto'}}>
           <View style={{marginVertical: 15}}>
             <AppleAuthenticationButton/>
           </View>
-          <GoogleAuthenticationButton />
+          <View style={{marginVertical: 15}}>
+            <GoogleAuthenticationButton />
+          </View>
           <Pressable style={{
             backgroundColor: continueAlt ? "gray":"white",
             borderRadius: 45,
