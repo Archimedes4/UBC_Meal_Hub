@@ -178,15 +178,6 @@ export default function FoodPage() {
               <StarComponent rating={5} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
             </View>
           </View>
-
-          {/* Ingredients */}
-          <Text style={{
-            fontSize: 22,
-            fontWeight: 'bold',
-            marginBottom: 8,
-            color: 'white',
-            marginLeft: 30
-          }}>Ingredients</Text>
         </ScrollView>
       </>
     );

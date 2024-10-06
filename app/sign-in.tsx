@@ -25,6 +25,8 @@ export default function signIn() {
     return <Redirect href="/onboarding"/>
   }
 
+  console.log("HER 1E")
+  
   if (authState === authStateEnum.signedIn) {
     return <Redirect href="/"/>
   }
