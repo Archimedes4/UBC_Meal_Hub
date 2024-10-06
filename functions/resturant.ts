@@ -25,7 +25,7 @@ export async function getResturantPretty(pretty: string): Promise<{
   }
 }
 
-export async function getResturants(): Promise<{
+export async function getResturants(search?: string): Promise<{
   result: loadingStateEnum.success,
   data: resturant[]
 } | {
@@ -33,8 +33,11 @@ export async function getResturants(): Promise<{
 }> {
   try {
     let resturants: resturant[] = []
-    const result = await getDocs(collection(db, "resturants"))
-    console.log(result.docs)
+    let q = query(collection(db, "resturants"))
+    if (search !== undefined && search !== "") {
+      q = query(collection(db, "resturants"), where("name", ">=", search))
+    }
+    const result = await getDocs(q)
     for (let index = 0; index < result.docs.length; index++) {
       console.log(result.docs[index].data())
       resturants.push(result.docs[index].data() as resturant)

@@ -70,7 +70,7 @@ export async function setUserRating(foodId: string, uid: string, rating: number)
   }
 }
 
-export async function getFoods(): Promise<{
+export async function getFoods(search?: string): Promise<{
   result: loadingStateEnum.success;
   data: food[];
 } | {
@@ -79,6 +79,10 @@ export async function getFoods(): Promise<{
   try {
     let foods: food[] = []
     const result = await getDocs(collection(db, "foods"))
+    let q = query(collection(db, "resturants"))
+    if (search !== undefined && search !== "") {
+      q = query(collection(db, "resturants"), where("name", ">=", search))
+    }
     result.forEach((doc) => {
       foods.push(doc.data() as food)
     })

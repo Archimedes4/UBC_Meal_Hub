@@ -59,6 +59,7 @@ declare global {
     email: string
     home_place: string
     payment: string
+    profileImage: number
   }
 }
 
