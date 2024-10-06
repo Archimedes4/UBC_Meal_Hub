@@ -93,3 +93,26 @@ export async function getFoods(): Promise<{
     }
   }
 }
+
+export async function getResturantFoods(resturant_id: string): Promise<{
+  result: loadingStateEnum.success;
+  data: food[];
+} | {
+  result: loadingStateEnum.failed
+}> {
+  try {
+    let foods: food[] = []
+    const result = await getDocs(query(collection(db, "foods"), where("restaurant_id", "==", resturant_id)))
+    result.forEach((doc) => {
+      foods.push(doc.data() as food)
+    })
+    return {
+      result: loadingStateEnum.success,
+      data: foods
+    }
+  } catch {
+    return {
+      result: loadingStateEnum.failed
+    }
+  }
+}

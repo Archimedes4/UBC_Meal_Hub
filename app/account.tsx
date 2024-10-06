@@ -7,6 +7,7 @@ import { loadingStateEnum } from '@/types';
 import { getResturants } from '@/functions/resturant';
 import ResturantComponent from '@/components/ResturantComponent';
 import { ChevronLeft } from '@/components/Icons';
+import Head from 'expo-router/head';
 
 function SelectResturantComponent() {
   const [resturantState, setResturantState] = useState<loadingStateEnum>(loadingStateEnum.loading)
@@ -141,7 +142,11 @@ export default function Account() {
   }
 
   return (
-    <ScrollView style={{width, height, backgroundColor: "#94C180"}}>
+    <>
+      <Head>
+        <title>Account | UBC Menu Hub</title>
+      </Head>
+      <ScrollView style={{width, height, backgroundColor: "#94C180"}}>
       <Pressable onPress={() => {router.push("/")}} style={{position: 'absolute'}}>
         <ChevronLeft width={50} height={50} style={{position: 'absolute', margin: 5}}/>
       </Pressable>
@@ -165,5 +170,6 @@ export default function Account() {
       <PaymentDropdown />
       <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25}}>Favorite Foods</Text>
     </ScrollView>
+    </>
   )
 }
