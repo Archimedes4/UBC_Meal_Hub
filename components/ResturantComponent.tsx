@@ -13,7 +13,10 @@ export default function ResturantComponent({
   resturant: resturant
 }) {
   return (
-    <View style={{borderRadius: 5, overflow: 'hidden', width, height}}>
+    <View style={{borderRadius: 5, overflow: 'hidden', width, height, shadowRadius: 5, shadowColor: 'black', shadowOffset: {
+      width: 2.5,
+      height: 2.5
+    }}}>
       <Image source={{uri: resturant.image !== "" ? resturant.image:'https://media.cnn.com/api/v1/images/stellar/prod/220428140436-04-classic-american-hamburgers.jpg?c=original'}} style={{width: width, height: height}}/>
       <BlurView intensity={100} style={{
         position: 'absolute',

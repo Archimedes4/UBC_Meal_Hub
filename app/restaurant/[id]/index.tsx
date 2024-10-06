@@ -2,11 +2,12 @@ import { View, Text, useWindowDimensions, ScrollView, Pressable } from 'react-na
 import React, { useEffect, useState } from 'react'
 import { router, useGlobalSearchParams } from 'expo-router'
 import { Image } from 'expo-image';
-import { loadingStateEnum, resturantStateEnum } from '@/types';
+import { resturantStateEnum } from '@/types';
 import LoadingScreen from '@/components/LoadingScreen';
 import { getResturantPretty } from '@/functions/resturant';
 import { ChevronLeft } from '@/components/Icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 
 function CategoryBlock({
   category
@@ -68,14 +69,22 @@ export default function RestaurantPage() {
           <ChevronLeft width={50} height={50}  style={{position: 'absolute', left: -3}}/>
         </Pressable>
         <Image source={resturant.image} style={{width, height: height * 0.3}} />
-        <View style={{height: 60}}>
-          <ScrollView style={{width, height: 60, backgroundColor: '#94c180', overflow: 'hidden'}} horizontal>
-            {resturant.restaurant_categories.map((category) => (
-              <CategoryBlock key={category} category={category} />
-            ))}
-          </ScrollView>
+        <View style={{width: width, height: height * 0.3, position: 'absolute', justifyContent: 'center', alignItems: 'center'}}>
+          <BlurView intensity={10} style={{width: width * 0.8, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center', padding: 10, borderRadius: 45}}>
+            <Text style={{fontSize: 55, fontWeight: 'bold', color: "white"}}>{resturant.name}</Text>
+          </BlurView>
         </View>
-        <Text>{resturant.name}</Text>
+        {(resturant.restaurant_categories.length === 1 && resturant.restaurant_categories[0] === "Main") ? null:(
+          <View style={{height: 60}}>
+            <ScrollView style={{width, height: 60, backgroundColor: '#94c180', overflow: 'hidden'}} horizontal>
+              {resturant.restaurant_categories.map((category) => (
+                <CategoryBlock key={category} category={category} />
+              ))}
+            </ScrollView>
+          </View>)}
+        <>
+        
+        </>
       </View>
     )
   }

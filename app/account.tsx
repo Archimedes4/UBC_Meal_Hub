@@ -15,6 +15,8 @@ import LoadingScreen from '@/components/LoadingScreen';
 import UserImage from '@/components/UserImage';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/functions/firebase';
+import { getFavoriteFoods } from '@/functions/food';
+import useNumColumns from '@/hooks/useNumColumns';
 
 function SelectResturantComponent() {
   const [resturantState, setResturantState] = useState<loadingStateEnum>(loadingStateEnum.loading)
@@ -202,14 +204,56 @@ export default function Account() {
         >
           <Text style={{fontSize: 25, fontWeight: 'bold'}}>Sign Out</Text>
         </Pressable>
-        <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25}}>Favorite Foods</Text>
-        <FlatList
-          data={[]}
-          renderItem={(food) => (<FoodComponent food={food.item} width={100} height={100}/>)}
-          horizontal
-          style={{marginTop: 15}}
-        />
+        <FavouriteFoodComponent />
+        <View style={{height: 15}}/>
       </ScrollView>
     </>
   )
+}
+
+function FavouriteFoodComponent() {
+  const [state, setState] = useState<loadingStateEnum>(loadingStateEnum.loading)
+  const [foods, setFoods] = useState<food[]>([])
+  const {width}= useWindowDimensions()
+  const numColumns = useNumColumns()
+
+  async function loadFoods() {
+    const result = await getFavoriteFoods()
+    setState(result.result)
+    if (result.result === loadingStateEnum.success) {
+      setFoods(result.data)
+    }
+  }
+
+  function rows(arrIn: food[], num: number) {
+    let arr = [...arrIn]
+    const newArr = [];
+    while(arr.length) newArr.push(arr.splice(0,num));
+    return newArr
+  }
+
+  useEffect(() => {
+    loadFoods()
+  }, [])
+
+  if (state === loadingStateEnum.failed) {
+    return <Text>Failed to load favourite foods</Text>
+  }
+
+  if (state === loadingStateEnum.success) {
+    return (
+      <View style={{width}}>
+        <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25}}>Favorite Foods</Text>
+        {rows(foods, numColumns).map(row => (
+          <View style={{flexDirection: 'row', paddingRight: 15}}>
+            {row.map((food) => (
+              <FoodComponent food={food} width={((width - 15)/numColumns) - 15} height={(((width - 15)/numColumns) - 15) * 0.8}/>
+            ))}
+          </View>
+        ))}
+      </View>
+    )
+  }
+
+  return null
 }
