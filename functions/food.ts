@@ -183,3 +183,30 @@ export async function getFavoriteFoods(): Promise<{
     }
   }
 }
+
+export async function getFoodsByCategory(resturentId: string, category: string): Promise<{
+  result: loadingStateEnum.success;
+  data: food[];
+} | {
+  result: loadingStateEnum.failed;
+}> {
+  try {
+    let foods: food[] = []
+    let q = query(collection(db, "foods"),  where("restaurant_id", "==", resturentId), where("category", "==", category))
+    if (category === "all") {
+      q = query(collection(db, "foods"),  where("restaurant_id", "==", resturentId))
+    }
+    const result = await getDocs(q)
+    result.forEach((doc) => {
+      foods.push(doc.data() as food)
+    })
+    return {
+      result: loadingStateEnum.success,
+      data: foods
+    }
+  } catch {
+    return {
+      result: loadingStateEnum.failed
+    }
+  }
+}

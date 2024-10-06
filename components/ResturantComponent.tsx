@@ -24,7 +24,7 @@ export default function ResturantComponent({
         width: width,
         height: 35
       }}>
-        <Text style={{marginVertical: 'auto', marginLeft: 5}}>{resturant.name}</Text>
+        <Text style={{marginVertical: 'auto', marginLeft: 5, fontWeight: 'bold', color: 'white'}}>{resturant.name}</Text>
       </BlurView>
     </View>
   )

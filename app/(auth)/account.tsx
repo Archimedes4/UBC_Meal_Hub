@@ -18,9 +18,15 @@ import { auth } from '@/functions/firebase';
 import { getFavoriteFoods } from '@/functions/food';
 import useNumColumns from '@/hooks/useNumColumns';
 
-function SelectResturantComponent() {
+function SelectResturantComponent({
+  length
+}:{
+  length: number;
+}) {
   const [resturantState, setResturantState] = useState<loadingStateEnum>(loadingStateEnum.loading)
   const [resturants, setResturants] = useState<resturant[]>([])
+  const numColumns = useNumColumns()
+  const {width} = useWindowDimensions()
   
   async function loadResturants() {
     // Fetch resturants from the backend
@@ -35,14 +41,31 @@ function SelectResturantComponent() {
     loadResturants()
   }, [])
 
+
+  function rows(arrIn: resturant[], num: number) {
+    let arr = [...arrIn]
+    const newArr = [];
+    while(arr.length) newArr.push(arr.splice(0,num));
+    return newArr
+  }
+
+
   return (
-    <ScrollView style={{marginTop: 1}}>
-      {resturants.map(resturant => (
-        <Pressable style={{marginLeft: 15}}>
-          <ResturantComponent resturant={resturant} width={200} height={200}/>
-        </Pressable>
-      ))}
-    </ScrollView>
+    <View style={{height: 200, width: width - 30}}>
+      <ScrollView style={{marginTop: 1, height: 200, width: width - 30}}>
+        <View style={{marginHorizontal: 'auto'}}>
+          {rows(resturants, numColumns).map((row) => (
+            <View style={{flexDirection: 'row', marginBottom: 15}}>
+              {row.map(resturant => (
+                <Pressable style={{marginHorizontal: 7.5}}>
+                  <ResturantComponent resturant={resturant} width={length} height={length}/>
+                </Pressable>
+              ))}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   )
 }
 
@@ -134,6 +157,7 @@ export default function Account() {
   const [isResturantDropped, setIsResturantDropped] = useState(false);
   const insets = useSafeAreaInsets()
   const {authState, user} = useAuth();
+  const numColumns = useNumColumns()
 
   const resturanDropStyle = useAnimatedStyle(() => {
     return {
@@ -147,7 +171,7 @@ export default function Account() {
       resturantDropHeight.value = withTiming(60);
       setIsResturantDropped(false)
     } else {
-      resturantDropHeight.value = withTiming(height);
+      resturantDropHeight.value = withTiming(280);
       setIsResturantDropped(true)
     }
   }
@@ -162,10 +186,7 @@ export default function Account() {
 
   if (user === null) {
     return (
-      <View style={{top: insets.top}}>
-        <Text>Something went wrong.</Text>
-        <Pressable onPress={() => router.push("/sign-in")}><Text>Sign In</Text></Pressable>
-      </View>
+      <Redirect href={'/sign-in'}/>
     )
   }
 
@@ -189,12 +210,13 @@ export default function Account() {
             width: width - 30,
             marginHorizontal: 15,
             backgroundColor: 'white',
-            position: 'absolute'
+            position: 'absolute',
+            overflow: 'hidden'
           }, resturanDropStyle]}>
             <Pressable style={{padding: 15}} onPress={() => {dropToggleResturant()}}>
               <Text style={{fontSize: 25, fontWeight: 'bold'}}>Open Kitchen</Text>
             </Pressable>
-            <SelectResturantComponent />
+            <SelectResturantComponent length={((width - 60)/numColumns - 15)}/>
           </Animated.View>
         </View>
         <PaymentDropdown />
@@ -240,6 +262,10 @@ function FavouriteFoodComponent() {
     return <Text>Failed to load favourite foods</Text>
   }
 
+  if (foods.length === 0) {
+    return null
+  }
+
   if (state === loadingStateEnum.success) {
     return (
       <View style={{width}}>
@@ -247,7 +273,11 @@ function FavouriteFoodComponent() {
         {rows(foods, numColumns).map(row => (
           <View style={{flexDirection: 'row', paddingRight: 15}}>
             {row.map((food) => (
-              <FoodComponent food={food} width={((width - 15)/numColumns) - 15} height={(((width - 15)/numColumns) - 15) * 0.8}/>
+              <Pressable onPress={() => {
+                router.push(`/restaurant/${food.restaurant_id}/food/${food.pretty}`)
+              }}>
+                <FoodComponent food={food} width={((width - 15)/numColumns) - 15} height={(((width - 15)/numColumns) - 15) * 0.8}/>
+              </Pressable>
             ))}
           </View>
         ))}

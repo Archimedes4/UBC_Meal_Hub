@@ -21,7 +21,6 @@ export default function useAuth() {
     // If they are not, set the user and signedIn state to null and false respectively
     const sub = onAuthStateChanged(auth, (data) => {
       if (data === null) {
-        console.log("No user signed in");
         setAuthState(authStateEnum.noAuth)
       } else {
         console.log(data.uid)

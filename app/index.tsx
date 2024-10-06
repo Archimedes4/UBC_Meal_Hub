@@ -185,6 +185,7 @@ function FoodMenu({
   }, [search])
 
   function rows(arrIn: food[], num: number) {
+    console.log(arrIn)
     let arr = [...arrIn]
     const newArr = [];
     while(arr.length) newArr.push(arr.splice(0,num));
@@ -205,11 +206,11 @@ function FoodMenu({
   }
 
   return (
-    <View style={{height: (isShowingMore || foods.length <= (numColumns * 2)) ? "auto":(height * 0.9 - (insets.top + insets.bottom + 60)) * 0.8}}>
+    <View>
       <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
-      {rows(foods.slice(0, (isShowingMore) ? foods.length:3), numColumns).map((row) => (
+      {rows([...foods].slice(0, (isShowingMore) ? foods.length:(numColumns * 2)), numColumns).map((row) => (
         <View style={{flexDirection: 'row', marginBottom: 15}}>
-          {foods.map((food) => (
+          {row.map((food) => (
             <Pressable onPress={() => router.push(`/restaurant/${food.restaurant_id}/food/${food.pretty}`)}>
               <FoodComponent food={food} width={(width - 15)/numColumns} height={(width/numColumns) * 0.8}/>
             </Pressable>

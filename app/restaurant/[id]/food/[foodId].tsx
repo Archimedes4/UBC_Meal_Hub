@@ -9,6 +9,7 @@ import useAuth from '@/hooks/useAuth';
 import Head from 'expo-router/head';
 import { addHeart, removeHeart } from '@/functions/hearts';
 import { auth } from '@/functions/firebase';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function StarComponent({rating, foodId, uid, hoverRating, setHoverRating}:{
   rating: number
@@ -84,7 +85,6 @@ function HeartComponent({
 }
 
 export default function FoodPage() {
-  const foodImage = 'https://media.cnn.com/api/v1/images/stellar/prod/220428140436-04-classic-american-hamburgers.jpg?c=16x9&q=h_653,w_1160,c_fill/f_webp';
   const [food, setFood] = useState<food | null>(null);
   const [foodState, setFoodState] = useState<foodStateEnum>(foodStateEnum.loading);
   const [hoverRating, setHoverRating] = useState(-1);
@@ -92,6 +92,7 @@ export default function FoodPage() {
   const {id, foodId} = useGlobalSearchParams()
   const {uid} = useAuth()
   const {width, height} = useWindowDimensions();
+  const insets = useSafeAreaInsets()
 
   async function loadFood() {
     if (typeof id !== 'string' || typeof foodId !== 'string') {
@@ -130,13 +131,13 @@ export default function FoodPage() {
         </Head>
         <ScrollView style={styles.container}>
           <Pressable
-            style={{position: 'absolute', zIndex: 2, backgroundColor: 'white', marginLeft: 15, marginTop: 15, borderRadius: 50, width: 50, height: 50}}
+            style={{position: 'absolute', zIndex: 2, backgroundColor: 'white', left: 15, top: 15 + insets.top, borderRadius: 50, width: 50, height: 50}}
             onPress={() => {router.push("/")}}
           >
             <ChevronLeft width={50} height={50} style={{position: 'absolute', left: -2}}/>
           </Pressable>
           {/* Food Image */}
-          <Image source={{ uri: foodImage }} style={{
+          <Image source={{ uri: food.image }} style={{
             width: width,
             height: height * 0.3,
             resizeMode: 'cover',
@@ -149,7 +150,7 @@ export default function FoodPage() {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: 15,
-              fontSize: Math.min(width* 0.1, 56),
+              fontSize: Math.min(width* 0.08, 56),
               color: "white",
               fontWeight: "bold",
             }}>{food.name}</Text>
@@ -177,15 +178,6 @@ export default function FoodPage() {
               <StarComponent rating={5} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
             </View>
           </View>
-
-          {/* Ingredients */}
-          <Text style={{
-            fontSize: 22,
-            fontWeight: 'bold',
-            marginBottom: 8,
-            color: 'white',
-            marginLeft: 30
-          }}>Ingredients</Text>
         </ScrollView>
       </>
     );
