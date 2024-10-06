@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
 import { ChevronLeft, HeartIcon, StarIcon } from '../../../../components/Icons';
-import { foodStateEnum } from '@/types';
+import { foodStateEnum, loadingStateEnum } from '@/types';
 import LoadingScreen from '@/components/LoadingScreen';
 import { getFoodPretty, setUserRating } from '@/functions/food';
 import { router, useGlobalSearchParams } from 'expo-router';
 import useAuth from '@/hooks/useAuth';
+import Head from 'expo-router/head';
+import { addHeart, removeHeart } from '@/functions/hearts';
 
 function StarComponent({rating, foodId, uid, hoverRating, setHoverRating}:{
   rating: number
@@ -36,8 +38,43 @@ function StarComponent({rating, foodId, uid, hoverRating, setHoverRating}:{
   )
 }
 
-export default function FoodPage() {
+function HeartComponent({
+  food
+}:{
+  food: food
+}) {
+  const [heartState, setHeartState] = useState(loadingStateEnum.success)
+  const {uid} = useAuth()
   const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    setIsFavorite(food.hearts.includes(uid))
+  }, [])
+
+  return (
+    <Pressable onPress={async () => {
+      if (isFavorite === true) {
+        setHeartState(loadingStateEnum.loading)
+        setHeartState(await removeHeart(food.food_id))
+        setIsFavorite(false)
+        console.log('HERe')
+      } else {
+        setHeartState(loadingStateEnum.loading)
+        setHeartState(await addHeart(food.food_id))
+        setIsFavorite(true)
+        console.log('HERe tru ')
+      }
+    }}>
+      {(heartState === loadingStateEnum.loading) &&
+        <View style={{height: 50, width: 50}}>
+          <ActivityIndicator />
+        </View>}
+      {(heartState !== loadingStateEnum.loading) && <HeartIcon width={50} height={50} color={isFavorite ? 'red' : 'white'} />}
+    </Pressable>
+  )
+}
+
+export default function FoodPage() {
   const foodImage = 'https://media.cnn.com/api/v1/images/stellar/prod/220428140436-04-classic-american-hamburgers.jpg?c=16x9&q=h_653,w_1160,c_fill/f_webp';
   const [food, setFood] = useState<food | null>(null);
   const [foodState, setFoodState] = useState<foodStateEnum>(foodStateEnum.loading);
@@ -78,69 +115,70 @@ export default function FoodPage() {
 
   if (foodState === foodStateEnum.success && food !== null && typeof foodId === 'string') {
     return (
-      <ScrollView style={styles.container}>
-        <Pressable
-          style={{position: 'absolute', zIndex: 2, backgroundColor: 'white', marginLeft: 15, marginTop: 15, borderRadius: 50, width: 50, height: 50}}
-          onPress={() => {router.push("/")}}
-        >
-          <ChevronLeft width={50} height={50} style={{position: 'absolute', left: -2}}/>
-        </Pressable>
-        {/* Food Image */}
-        <Image source={{ uri: foodImage }} style={{
-          width: width,
-          height: height * 0.3,
-          resizeMode: 'cover',
-        }} />
-
-        {/* Food Name & Favorite Button */}
-        <View style={styles.headerContainer}>
-          <Text style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: 15,
-            fontSize: Math.min(width* 0.1, 56),
-            color: "white",
-            fontWeight: "bold",
-          }}>{food.name}</Text>
-          <Pressable onPress={() => {
-              setIsFavorite(!isFavorite);
-          }}>
-            <HeartIcon width={45} height={45} color={"red"}/>
+      <>
+        <Head>
+          <title>{food.name} | UBC Menu Hub</title>
+        </Head>
+        <ScrollView style={styles.container}>
+          <Pressable
+            style={{position: 'absolute', zIndex: 2, backgroundColor: 'white', marginLeft: 15, marginTop: 15, borderRadius: 50, width: 50, height: 50}}
+            onPress={() => {router.push("/")}}
+          >
+            <ChevronLeft width={50} height={50} style={{position: 'absolute', left: -2}}/>
           </Pressable>
-        </View>
-        {/* Rating */}
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 16,
-          marginBottom: 16,
-          marginLeft: 15
-        }}>
-          {(food.rating_sum !== 0) && <Text style={{
-            fontSize: 56,
-            marginRight: 8,
-            fontWeight: 'bold',
-            color: "white"
-          }} numberOfLines={1}>{Math.round(food.rating_count/food.rating_sum * 100)/100}</Text>}
-          <View style={styles.starsContainer}>
-            <StarComponent rating={1} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
-            <StarComponent rating={2} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
-            <StarComponent rating={3} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
-            <StarComponent rating={4} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
-            <StarComponent rating={5} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
-          </View>
-        </View>
+          {/* Food Image */}
+          <Image source={{ uri: foodImage }} style={{
+            width: width,
+            height: height * 0.3,
+            resizeMode: 'cover',
+          }} />
 
-        {/* Ingredients */}
-        <Text style={{
-          fontSize: 22,
-          fontWeight: 'bold',
-          marginBottom: 8,
-          color: 'white',
-          marginLeft: 30
-        }}>Ingredients</Text>
-      </ScrollView>
+          {/* Food Name & Favorite Button */}
+          <View style={styles.headerContainer}>
+            <Text style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: 15,
+              fontSize: Math.min(width* 0.1, 56),
+              color: "white",
+              fontWeight: "bold",
+            }}>{food.name}</Text>
+            <HeartComponent food={food} />
+          </View>
+          {/* Rating */}
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            marginBottom: 16,
+            marginLeft: 15
+          }}>
+            {(food.rating_sum !== 0) && <Text style={{
+              fontSize: 56,
+              marginRight: 8,
+              fontWeight: 'bold',
+              color: "white"
+            }} numberOfLines={1}>{Math.round(food.rating_count/food.rating_sum * 100)/100}</Text>}
+            <View style={styles.starsContainer}>
+              <StarComponent rating={1} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
+              <StarComponent rating={2} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
+              <StarComponent rating={3} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
+              <StarComponent rating={4} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
+              <StarComponent rating={5} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
+            </View>
+          </View>
+
+          {/* Ingredients */}
+          <Text style={{
+            fontSize: 22,
+            fontWeight: 'bold',
+            marginBottom: 8,
+            color: 'white',
+            marginLeft: 30
+          }}>Ingredients</Text>
+        </ScrollView>
+      </>
     );
   }
   return (

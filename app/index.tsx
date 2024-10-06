@@ -10,6 +10,9 @@ import { loadingStateEnum } from '@/types';
 import FoodComponent from '@/components/FoodComponent';
 import { getGreeting } from '@/functions/getGreeting';
 import useNumColumns from '@/hooks/useNumColumns';
+import Head from 'expo-router/head'
+import ResturantComponent from '@/components/ResturantComponent';
+import { getResturants } from '@/functions/resturant';
 
 function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,50 +68,59 @@ export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
 
   return (
-    <View>
-      {/* top part */} 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          padding: 16, 
-          width,
-          height: height * 0.1,
-          backgroundColor: "#CAE9BB"
-        }}
-      >
-        <View> 
-          <Text style={{fontSize: 20, marginBottom: 2}}>{getGreeting()}</Text>
-          <Text style={{fontSize: 25, fontWeight: 'bold'}}>Andrew Mainella</Text> 
+    <>
+      <Head>
+        <title>UBC Menu Hub</title>
+      </Head>
+      <View>
+        {/* top part */} 
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            padding: 16, 
+            width,
+            height: height * 0.1,
+            backgroundColor: "#CAE9BB"
+          }}
+        >
+          <View> 
+            <Text style={{fontSize: 20, marginBottom: 2}}>{getGreeting()}</Text>
+            <Text style={{fontSize: 25, fontWeight: 'bold'}}>Andrew Mainella</Text> 
+          </View>
+          <Pressable onPress={() => {
+            router.push("/account")
+          }}>
+            <Image
+              source={require('@/assets/images/homelander.png')}
+              style={{width: 50, height: 50, borderRadius: 25}}
+            />
+          </Pressable>
         </View>
-        <Pressable onPress={() => {
-          router.push("/account")
-        }}>
-          <Image
-            source={require('@/assets/images/homelander.png')}
-            style={{width: 50, height: 50, borderRadius: 25}}
-          />
-        </Pressable>
+        <View
+          style={{
+            backgroundColor: '#94C180',
+            width,
+            height: height * 0.9,
+          }}
+        >
+          <SearchComponent />
+          <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
+          <FoodMenu />
+          <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Resturants</Text>
+          <ResturantMenu />
+        </View>
       </View>
-      <View
-        style={{
-          backgroundColor: '#94C180',
-          width,
-          height: height * 0.9,
-        }}
-      >
-        <SearchComponent />
-        <HomeMenu />
-      </View>
-    </View>
+    </>
   );
 }
 
-function HomeMenu() {
+function FoodMenu() {
   const [foodState, setFoodState] = useState(loadingStateEnum.loading)
   const [foods, setFoods] = useState<food[]>([])
   const numColumns = useNumColumns()
+  const {width} = useWindowDimensions()
 
   async function loadFoods() {
     const result = await getFoods()
@@ -136,7 +148,50 @@ function HomeMenu() {
       data={foods}
       numColumns={numColumns}
       renderItem={(food) => (
-        <FoodComponent food={food.item} width={0} height={0}/>
+        <FoodComponent food={food.item} width={(width - 15)/numColumns} height={(width/numColumns) * 0.8}/>
+      )}
+      style={{paddingRight: 15}}
+    />
+  )
+}
+
+
+function ResturantMenu() {
+  const [resturantState, setResturantState] = useState(loadingStateEnum.loading)
+  const [resturants, setResturants] = useState<resturant[]>([])
+  const numColumns = useNumColumns()
+  const {width} = useWindowDimensions()
+
+  async function loadFoods() {
+    const result = await getResturants()
+    setResturantState(result.result)
+    if (result.result === loadingStateEnum.success) {
+      setResturants(result.data)
+    }
+  }
+
+  useEffect(() => {
+    loadFoods()
+  }, [])
+
+  if (resturantState === loadingStateEnum.loading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center'}}>
+        <ActivityIndicator size="large" color={"white"}/>
+        <Text style={{textAlign: 'center', color: 'white', marginTop: 15}}>Loading...</Text>
+      </View>
+    )
+  }
+
+  return (
+    <FlatList
+      data={resturants}
+      numColumns={numColumns}
+      style={{paddingRight: 15}}
+      renderItem={(food) => (
+        <View style={{marginLeft: 15, marginBottom: 15}}>
+          <ResturantComponent resturant={food.item} width={((width - 15)/numColumns) -15} height={(width/numColumns) * 0.8}/>
+        </View>
       )}
     />
   )
