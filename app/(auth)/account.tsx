@@ -186,10 +186,7 @@ export default function Account() {
 
   if (user === null) {
     return (
-      <View style={{top: insets.top}}>
-        <Text>Something went wrong.</Text>
-        <Pressable onPress={() => router.push("/sign-in")}><Text>Sign In</Text></Pressable>
-      </View>
+      <Redirect href={'/sign-in'}/>
     )
   }
 
