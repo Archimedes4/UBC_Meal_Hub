@@ -30,19 +30,28 @@ export default function signIn() {
       <Head>
         <title>Sign In | UBC Menu Hub</title>
       </Head>
-      <View style={{width, height, backgroundColor: "#ADEE8F"}}>
-        <View style={{margin: 'auto'}}>
-          <Text style={{fontFamily: "PorterSansBlock", fontSize: 50}}>UBC Menu Hub</Text>
-          <View style={{width: Math.min(500, width), marginHorizontal: 'auto'}}>
-            <View style={{marginVertical: 15}}>
-              <AppleAuthenticationButton/>
-            </View>
+    <View style={{width, height, backgroundColor: "#ADEE8F"}}>
+      <View style={{margin: 'auto'}}>
+        <Text style={{fontFamily: "PorterSansBlock", fontSize: 50}}>UBC Menu Hub</Text>
+
+        <View style={{width: Math.min(500, width), marginHorizontal: 'auto'}}>
+          <View style={{marginVertical: 15}}>
+            <AppleAuthenticationButton/>
+          </View>
+          <View style={{marginVertical: 15}}>
             <GoogleAuthenticationButton />
-            <Pressable style={{
-              backgroundColor: continueAlt ? "gray":"white",
-              borderRadius: 45,
-              borderWidth: 2,
-              padding: 15
+          </View>
+          <Pressable style={{
+            backgroundColor: continueAlt ? "gray":"white",
+            borderRadius: 45,
+            borderWidth: 2,
+            padding: 15
+          }}
+            onHoverIn={() => setContinueAlt(true)}
+            onHoverOut={() => setContinueAlt(false)}
+            onPress={() => {
+              console.log("Continue as guest");
+              signInAnonymously(auth)
             }}
               onHoverIn={() => setContinueAlt(true)}
               onHoverOut={() => setContinueAlt(false)}

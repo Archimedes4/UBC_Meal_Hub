@@ -32,7 +32,7 @@ export default function GoogleAuthenticationButton() {
         borderRadius: 4,
         borderColor: "black",
         borderWidth: 1,
-        height: 38,
+        height: 700,
         width: width * ((width <= 560) ? 0.95:0.8) - 22,
         paddingHorizontal: 12,
         marginTop: 5,
