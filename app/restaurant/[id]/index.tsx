@@ -6,6 +6,7 @@ import { loadingStateEnum, resturantStateEnum } from '@/types';
 import LoadingScreen from '@/components/LoadingScreen';
 import { getResturantPretty } from '@/functions/resturant';
 import { ChevronLeft } from '@/components/Icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function CategoryBlock({
   category
@@ -31,6 +32,7 @@ export default function RestaurantPage() {
   const {width, height} = useWindowDimensions()
   const [resturantState, setResturantState] = useState<resturantStateEnum>(resturantStateEnum.loading)
   const [resturant, setResturant] = useState<resturant | null>(null)
+  const insets = useSafeAreaInsets()
 
   async function loadResturant() {
     try {
@@ -62,7 +64,7 @@ export default function RestaurantPage() {
   if (resturantState === resturantStateEnum.success && resturant !== null) {
     return (
       <View style={{width, height, backgroundColor: "#94c180"}}>
-        <Pressable style={{position: 'absolute', margin: 15, zIndex: 2, backgroundColor: 'white', width: 50, height: 50, borderRadius: 25}} onPress={() => router.push("/")}>
+        <Pressable style={{position: 'absolute', margin: 15, zIndex: 2, backgroundColor: 'white', width: 50, height: 50, borderRadius: 25, top: insets.top}} onPress={() => router.push("/")}>
           <ChevronLeft width={50} height={50}  style={{position: 'absolute', left: -3}}/>
         </Pressable>
         <Image source={resturant.image} style={{width, height: height * 0.3}} />

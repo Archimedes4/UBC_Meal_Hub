@@ -71,7 +71,9 @@ function SearchComponent({onChange}:{onChange: (text: string) => void}) {
           ...(Platform.OS === 'web' && {
             outlineStyle: 'none', // Web-specific property to hide the outline
           }),
+          color: "black"
         }}
+        placeholderTextColor={'black'}
       />
     </View>
   )
@@ -99,7 +101,7 @@ export default function HomeScreen() {
       <Head>
         <title>UBC Menu Hub</title>
       </Head>
-      <View>
+      <View style={{width, height}}>
         {/* top part */} 
         <View
           style={{
@@ -120,7 +122,7 @@ export default function HomeScreen() {
           <Pressable onPress={() => {
             router.push("/account")
           }} style={{borderRadius: 100, overflow: 'hidden'}}>
-            <UserImage index={0} style={{width: 50, height: 50, borderRadius: 25}} length={60}/>
+            <UserImage index={user?.profileImage ?? 0} style={{width: 50, height: 50, borderRadius: 25}} length={60}/>
           </Pressable>
         </View>
         <View
@@ -133,19 +135,20 @@ export default function HomeScreen() {
           <SearchComponent onChange={(e) => {
             setSearchText(e)
           }}/>
-          <ScrollView>
+          <ScrollView style={{height: (height * 0.9) - (insets.top + insets.bottom + 60), width}}>
             {(homeScreenMode !== homeScreenModeEnum.resturant) && (
-              <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
+              <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60)) * 0.8}}>
                 <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
                 <FoodMenu search={searchText}/>
               </View>
             )}
             {(homeScreenMode !== homeScreenModeEnum.resturant) && (
-              <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
+              <View>
                 <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Resturants</Text>
                 <ResturantMenu search={searchText}/>
               </View>
             )}
+            <View style={{height: insets.bottom * 2}}/>
           </ScrollView>
         </View>
       </View>

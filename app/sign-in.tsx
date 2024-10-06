@@ -5,7 +5,7 @@ import GoogleAuthenticationButton from '@/components/GoogleAuthenticationButton'
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '@/functions/firebase';
 import useAuth from '@/hooks/useAuth';
-import { authStateEnum, loadingStateEnum } from '@/types';
+import { authStateEnum, colors, loadingStateEnum } from '@/types';
 import { Redirect } from 'expo-router';
 import LoadingScreen from '@/components/LoadingScreen';
 import Head from 'expo-router/head';
@@ -21,6 +21,10 @@ export default function signIn() {
     )
   }
 
+  if (authState === authStateEnum.noAccount) {
+    return <Redirect href="/onboarding"/>
+  }
+
   if (authState === authStateEnum.signedIn) {
     return <Redirect href="/"/>
   }
@@ -30,14 +34,14 @@ export default function signIn() {
       <Head>
         <title>Sign In | UBC Menu Hub</title>
       </Head>
-      <View style={{width, height, backgroundColor: "#ADEE8F"}}>
+      <View style={{width, height, backgroundColor: colors.primary}}>
         <View style={{margin: 'auto'}}>
-          <Text style={{fontFamily: "PorterSansBlock", fontSize: 50}}>UBC Menu Hub</Text>
+          <Text style={{fontFamily: "PorterSansBlock", fontSize: (width <= 576) ? 25:50, marginHorizontal: 'auto'}}>UBC Menu Hub</Text>
           <View style={{width: Math.min(500, width), marginHorizontal: 'auto'}}>
-            <View style={{marginVertical: 15}}>
+            <View style={{marginTop: 15, marginHorizontal: 15}}>
               <AppleAuthenticationButton/>
             </View>
-            <View style={{marginVertical: 15}}>
+            <View style={{marginVertical: 15, marginHorizontal: 15}}>
               <GoogleAuthenticationButton />
            </View>
             <Pressable
@@ -45,7 +49,8 @@ export default function signIn() {
                 backgroundColor: continueAlt ? "gray":"white",
                 borderRadius: 45,
                 borderWidth: 2,
-                padding: 15
+                padding: 15,
+                marginHorizontal: 15
               }}
               onHoverIn={() => setContinueAlt(true)}
               onHoverOut={() => setContinueAlt(false)}
