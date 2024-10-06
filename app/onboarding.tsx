@@ -2,69 +2,67 @@
 Profile form
 Quy Duong Nguyen
 */
+import UserImage from '@/components/UserImage';
+import { auth, db } from '@/functions/firebase';
+import { colors } from '@/types';
+import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, FlatList, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, FlatList, Alert, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 
-// Define the image data type
-type ImageData = {
-  id: string;
-  uri: any; // If the image is imported using `require`, you can use the type `any` or `ImageSourcePropType`
-};
+
+function ProfileIcon({index, setIndex, selectedIndex}:{index: number; setIndex: (index: number) => void, selectedIndex: number}) {
+  if (selectedIndex === index) {
+    return (
+      <Pressable onPress={() => {setIndex(index)}} style={{borderRadius: 100, overflow: 'hidden', borderWidth: 5, width: 150, height: 150, marginHorizontal: 'auto', justifyContent: 'center'}}>
+        <UserImage index={index} length={140}/>
+      </Pressable>
+    )
+  }
+  return (
+    <Pressable onPress={() => {setIndex(index)}} style={{borderRadius: 100, overflow: 'hidden', width: 150, height: 150, marginHorizontal: 'auto', justifyContent: 'center', marginVertical: 'auto'}}>
+      <UserImage index={index} length={150} style={{width: 120, height: 120}} viewStyle={{width: 150, height: 150}}/>
+    </Pressable>
+  )
+}
 
 export default function ProfileForm() {
   // Form states for user details
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-
-  // Image selection state for selecting only one image
-  const images: ImageData[] = [
-    { id: '1', uri: require('@/assets/images/beef pho.png') },
-    { id: '2', uri: require('@/assets/images/butter chicken.png') },
-    { id: '3', uri: require('@/assets/images/cheeseburger real.png') },
-    { id: '4', uri: require('@/assets/images/chicken thigh.png') },
-    { id: '5', uri: require('@/assets/images/dim sum.png') },
-    { id: '6', uri: require('@/assets/images/pork chop.png') },
-  ];
-
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  // Handle image selection for a single image
-  const handleSelectImage = (id: string) => {
-    if (selectedImage === id) {
-      // Deselect image if it's already selected
-      setSelectedImage(null);
-    } else {
-      // Select the new image
-      setSelectedImage(id);
-    }
-  };
+  const [selectedProfile, setSelectedProfile] = useState<number>(3);
+  const {width} = useWindowDimensions()
 
   // Handle form submission
-  const handleSubmit = () => {
-    if (firstName && lastName && email && selectedImage) {
-      Alert.alert('Profile Saved', `Name: ${firstName} ${lastName}\nEmail: ${email}\nSelected Image: ${selectedImage}`);
-      // Here you can proceed to the next step or submit the data to a server
-    } else {
-      Alert.alert('Incomplete', 'Please fill in all fields and select an image.');
+  async function handleSubmit() {
+    const uid = auth.currentUser?.uid
+    if (!firstName || !lastName || !email || selectedProfile === null || uid === undefined) {
+      Alert.alert('Please fill out all fields');
+      return;
+    }
+
+    // Save user details to database
+    // ...
+    try {
+      await setDoc(doc(db, 'users', uid), {
+        firstName,
+        lastName,
+        email,
+        profileImage: selectedProfile,
+      })
+    } catch {
+      Alert.alert('Something went wrong. Please try again.');
     }
   };
 
-  // Render each image in the grid
-  const renderImage = ({ item }: { item: ImageData }) => (
-    <TouchableOpacity
-      onPress={() => handleSelectImage(item.id)}
-      style={[
-        styles.imageContainer,
-        selectedImage === item.id ? styles.selected : null, // Highlight the selected image
-      ]}
-    >
-      <Image source={item.uri} style={styles.image} />
-    </TouchableOpacity>
-  );
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={{
+      flexGrow: 1,
+      padding: 20,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
       <Text style={styles.title}>Complete Your Profile</Text>
 
       {/* First Name Input */}
@@ -95,18 +93,21 @@ export default function ProfileForm() {
       <Text style={styles.subtitle}>Choose 1 Picture</Text>
 
       {/* Image Selection Grid */}
-      <FlatList
-        data={images}
-        renderItem={renderImage}
-        keyExtractor={(item) => item.id}
-        numColumns={3} // Display 3 images per row
-        style={styles.imageGrid}
-      />
+      <View style={{flexDirection: 'row', width, marginVertical: 15, height: 160}}>
+        <ProfileIcon index={0} setIndex={setSelectedProfile}  selectedIndex={selectedProfile} />
+        <ProfileIcon index={1} setIndex={setSelectedProfile} selectedIndex={selectedProfile} />
+        <ProfileIcon index={2} setIndex={setSelectedProfile} selectedIndex={selectedProfile} />
+      </View>
+      <View style={{flexDirection: 'row', width, marginVertical: 15, height: 160}}>
+        <ProfileIcon index={3} setIndex={setSelectedProfile} selectedIndex={selectedProfile} />
+        <ProfileIcon index={4} setIndex={setSelectedProfile} selectedIndex={selectedProfile} />
+        <ProfileIcon index={5} setIndex={setSelectedProfile} selectedIndex={selectedProfile} />
+      </View>
 
       {/* Submit Button */}
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+      <Pressable style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>Save Profile</Text>
-      </TouchableOpacity>
+      </Pressable>
     </ScrollView>
   );
 }

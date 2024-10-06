@@ -57,8 +57,6 @@ export default function AdminAddFoodScreen() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
     }

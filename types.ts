@@ -7,7 +7,8 @@ export enum loadingStateEnum {
 export enum authStateEnum {
   loading,
   signedIn,
-  noAuth
+  noAuth,
+  noAccount
 }
 
 export enum resturantStateEnum {
@@ -34,6 +35,7 @@ declare global {
   type food = {
     food_id: string;
     name: string;
+    pretty: string;
     rating_sum: number;
     rating_count: number;
     hearts: string[]; // uids of users that have hearted
@@ -51,4 +53,16 @@ declare global {
     image: string
     restaurant_categories: string[]
   }
+  type user = {
+    firstName: string
+    lastName: string
+    email: string
+    home_place: string
+    payment: string
+  }
+}
+
+export enum colors{
+  primary = "#94C180",
+  secondary = "#CAE9BB"
 }

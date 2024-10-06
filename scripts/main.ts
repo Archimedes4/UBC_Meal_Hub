@@ -1,4 +1,4 @@
-import generateUUID from "../functions/generateUUID";
+import generateUUID from "./generateUUID";
 import { initializeApp } from "firebase/app";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
 // This is a function that pulls data from neutricslice and adds to firebase

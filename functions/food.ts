@@ -11,7 +11,6 @@ export async function getFoodPretty(pretty: string, resturantId: string): Promis
 }> {
   try {
     const resturant = await getResturantPretty(resturantId)
-    console.log(resturant)
     if (resturant.result !== resturantStateEnum.success) {
       return {result: foodStateEnum.failed}
     }

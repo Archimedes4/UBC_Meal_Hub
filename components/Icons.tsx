@@ -68,3 +68,19 @@ export function ChevronLeft({
     </Svg>
   )
 }
+
+export function ChevronDown({
+  width,
+  height,
+  style
+}:{
+  width: number;
+  height: number;
+  style?: ViewStyle;
+}) {
+  return (
+    <Svg viewBox="0 0 24 24" fill="none" width={width} height={height} style={style}>
+      <Path d="M6 9L12 15L18 9" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </Svg>
+  )
+}

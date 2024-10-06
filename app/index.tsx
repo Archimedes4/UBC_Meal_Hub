@@ -1,18 +1,21 @@
 // UBC Meal Hub
 // Home page
 // Quy Duong Nguyen
-import { Image, StyleSheet, Platform, View, useWindowDimensions, Text, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { Image, StyleSheet, Platform, View, useWindowDimensions, Text, Pressable, FlatList, ActivityIndicator, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { TextInput } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 import { getFoods } from '@/functions/food';
-import { loadingStateEnum } from '@/types';
+import { authStateEnum, colors, loadingStateEnum } from '@/types';
 import FoodComponent from '@/components/FoodComponent';
 import { getGreeting } from '@/functions/getGreeting';
 import useNumColumns from '@/hooks/useNumColumns';
 import Head from 'expo-router/head'
 import ResturantComponent from '@/components/ResturantComponent';
 import { getResturants } from '@/functions/resturant';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import UserImage from '@/components/UserImage';
+import useAuth from '@/hooks/useAuth';
+import LoadingScreen from '@/components/LoadingScreen';
 
 function SearchComponent() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,8 +67,21 @@ function SearchComponent() {
   )
 }
 
+enum homeScreenModeEnum {
+  both,
+  food,
+  resturant
+}
+
 export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets()
+  const [homeScreenMode, setHomeScreenMode] = useState(homeScreenModeEnum.both)
+  const {authState, user} = useAuth();
+
+  if (authState === authStateEnum.loading) {
+    return <LoadingScreen />
+  }
 
   return (
     <>
@@ -79,37 +95,44 @@ export default function HomeScreen() {
             flexDirection: 'row',
             alignItems: 'center', 
             justifyContent: 'space-between',
-            padding: 16, 
             width,
-            height: height * 0.1,
-            backgroundColor: "#CAE9BB"
+            height: height * 0.1 + insets.top,
+            backgroundColor: colors.secondary,
+            paddingTop: insets.top,
+            paddingHorizontal: 15
           }}
         >
-          <View> 
-            <Text style={{fontSize: 20, marginBottom: 2}}>{getGreeting()}</Text>
-            <Text style={{fontSize: 25, fontWeight: 'bold'}}>Andrew Mainella</Text> 
+          <View style={{marginVertical: 'auto'}}>
+            <Text style={{fontSize: 20, marginBottom: 2, marginVertical: 'auto'}}>{getGreeting()}</Text>
+            {(authState === authStateEnum.signedIn && user !== null) && (<Text style={{fontSize: 25, fontWeight: 'bold'}}>{user.firstName} {user.lastName}</Text> )}
           </View>
           <Pressable onPress={() => {
             router.push("/account")
-          }}>
-            <Image
-              source={require('@/assets/images/homelander.png')}
-              style={{width: 50, height: 50, borderRadius: 25}}
-            />
+          }} style={{borderRadius: 100, overflow: 'hidden'}}>
+            <UserImage index={0} style={{width: 50, height: 50, borderRadius: 25}} length={60}/>
           </Pressable>
         </View>
         <View
           style={{
-            backgroundColor: '#94C180',
+            backgroundColor:colors.primary,
             width,
             height: height * 0.9,
           }}
         >
           <SearchComponent />
-          <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
-          <FoodMenu />
-          <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Resturants</Text>
-          <ResturantMenu />
+          {(homeScreenMode !== homeScreenModeEnum.resturant) && (
+            <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
+              <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
+              
+              <FoodMenu />
+            </View>
+          )}
+          {(homeScreenMode !== homeScreenModeEnum.resturant) && (
+            <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
+              <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Resturants</Text>
+              <ResturantMenu />
+            </View>
+          )}
         </View>
       </View>
     </>
@@ -148,7 +171,9 @@ function FoodMenu() {
       data={foods}
       numColumns={numColumns}
       renderItem={(food) => (
-        <FoodComponent food={food.item} width={(width - 15)/numColumns} height={(width/numColumns) * 0.8}/>
+        <Pressable onPress={() => router.push(`/restaurant/${food.item.restaurant_id}/food/${food.item.pretty}`)}>
+          <FoodComponent food={food.item} width={(width - 15)/numColumns} height={(width/numColumns) * 0.8}/>
+        </Pressable>
       )}
       style={{paddingRight: 15}}
     />
