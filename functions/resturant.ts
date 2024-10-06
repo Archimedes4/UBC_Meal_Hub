@@ -1,5 +1,5 @@
 import { loadingStateEnum, resturantStateEnum } from "@/types";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { and, collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
 
 /**
@@ -56,11 +56,11 @@ export async function getResturants(search?: string): Promise<{
     let resturants: resturant[] = []
     let q = query(collection(db, "resturants"))
     if (search !== undefined && search !== "") {
-      q = query(collection(db, "resturants"), where("name", ">=", search))
+      q = query(collection(db, "resturants"), and(where("name", ">=", search), where('name', '<=', search + '\uf8ff')))
     }
     const result = await getDocs(q)
+    console.log(result.docs.length)
     for (let index = 0; index < result.docs.length; index++) {
-      console.log(result.docs[index].data())
       resturants.push(result.docs[index].data() as resturant)
     }
 

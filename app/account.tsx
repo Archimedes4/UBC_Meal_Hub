@@ -243,7 +243,7 @@ function FavouriteFoodComponent() {
   if (state === loadingStateEnum.success) {
     return (
       <View style={{width}}>
-        <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25}}>Favorite Foods</Text>
+        <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25, marginBottom: 15}}>Favorite Foods</Text>
         {rows(foods, numColumns).map(row => (
           <View style={{flexDirection: 'row', paddingRight: 15}}>
             {row.map((food) => (
