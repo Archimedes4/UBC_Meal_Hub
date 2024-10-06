@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "UBC_Meal_Hub",
+    "name": "UBC Meal Hub",
     "slug": "UBC_Meal_Hub",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.Archimedes4.UBC-Meal-Hub"
     },
     "android": {
       "adaptiveIcon": {

@@ -1,13 +1,17 @@
-import { View, Text, useWindowDimensions, Pressable, ScrollView} from 'react-native'
+import { View, Text, useWindowDimensions, Pressable, ScrollView, FlatList} from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import Animated, {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
 import {Image} from 'expo-image'
-import { loadingStateEnum } from '@/types';
+import { authStateEnum, colors, loadingStateEnum } from '@/types';
 import { getResturants } from '@/functions/resturant';
 import ResturantComponent from '@/components/ResturantComponent';
 import { ChevronLeft } from '@/components/Icons';
 import Head from 'expo-router/head';
+import FoodComponent from '@/components/FoodComponent';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useAuth from '@/hooks/useAuth';
+import LoadingScreen from '@/components/LoadingScreen';
 
 function SelectResturantComponent() {
   const [resturantState, setResturantState] = useState<loadingStateEnum>(loadingStateEnum.loading)
@@ -123,6 +127,8 @@ export default function Account() {
   }, [width])
   const resturantDropHeight = useSharedValue(60);
   const [isResturantDropped, setIsResturantDropped] = useState(false);
+  const insets = useSafeAreaInsets()
+  const {authState} = useAuth();
 
   const resturanDropStyle = useAnimatedStyle(() => {
     return {
@@ -141,35 +147,49 @@ export default function Account() {
     }
   }
 
+  if (authState === authStateEnum.loading) {
+    return <LoadingScreen />
+  }
+
+  if (authState === authStateEnum.noAccount) {
+    return <Redirect href={'/onboarding'}/>
+  }
+
   return (
     <>
       <Head>
         <title>Account | UBC Menu Hub</title>
       </Head>
-      <ScrollView style={{width, height, backgroundColor: "#94C180"}}>
-      <Pressable onPress={() => {router.push("/")}} style={{position: 'absolute'}}>
-        <ChevronLeft width={50} height={50} style={{position: 'absolute', margin: 5}}/>
-      </Pressable>
-      <View style={{flexDirection: collaped ? undefined:"row", marginTop: height * 0.15, marginBottom: height * 0.05}}>
-        <Image source={'https://media.cnn.com/api/v1/images/stellar/prod/220428140436-04-classic-american-hamburgers.jpg?c=original'} style={{width: height * 0.3, height: height * 0.3, borderRadius: height * 0.3, marginHorizontal: 'auto'}}/>
-        <Text style={{fontSize: 35, fontWeight: 'bold', textAlign: collaped ? 'center':undefined}}>Andrew Mainella</Text>
-      </View>
-      <View style={{height: 60, zIndex: 2, marginBottom: 15}}>
-        <Animated.View style={[{
-          width: width - 30,
-          marginHorizontal: 15,
-          backgroundColor: 'white',
-          position: 'absolute'
-        }, resturanDropStyle]}>
-          <Pressable style={{padding: 15}} onPress={() => {dropToggleResturant()}}>
-            <Text style={{fontSize: 25, fontWeight: 'bold'}}>Open Kitchen</Text>
-          </Pressable>
-          <SelectResturantComponent />
-        </Animated.View>
-      </View>
-      <PaymentDropdown />
-      <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25}}>Favorite Foods</Text>
-    </ScrollView>
+      <ScrollView style={{width, height, backgroundColor: colors.primary}}>
+        <Pressable onPress={() => {router.push("/")}} style={{position: 'absolute'}}>
+          <ChevronLeft width={50} height={50} style={{position: 'absolute', margin: 5, top: insets.top}}/>
+        </Pressable>
+        <View style={{flexDirection: collaped ? undefined:"row", marginTop: height * 0.15, marginBottom: height * 0.05}}>
+          <Image source={'https://media.cnn.com/api/v1/images/stellar/prod/220428140436-04-classic-american-hamburgers.jpg?c=original'} style={{width: height * 0.3, height: height * 0.3, borderRadius: height * 0.3, marginLeft: collaped ? 'auto':25, marginHorizontal: collaped ? 'auto':0}}/>
+          <Text style={{fontSize: 35, fontWeight: 'bold', textAlign: collaped ? 'center':undefined, marginVertical: 'auto', marginLeft: collaped ? 0:25}}>Andrew Mainella</Text>
+        </View>
+        <View style={{height: 60, zIndex: 2, marginBottom: 15}}>
+          <Animated.View style={[{
+            width: width - 30,
+            marginHorizontal: 15,
+            backgroundColor: 'white',
+            position: 'absolute'
+          }, resturanDropStyle]}>
+            <Pressable style={{padding: 15}} onPress={() => {dropToggleResturant()}}>
+              <Text style={{fontSize: 25, fontWeight: 'bold'}}>Open Kitchen</Text>
+            </Pressable>
+            <SelectResturantComponent />
+          </Animated.View>
+        </View>
+        <PaymentDropdown />
+        <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25}}>Favorite Foods</Text>
+        <FlatList
+          data={[]}
+          renderItem={(food) => (<FoodComponent food={food.item} width={100} height={100}/>)}
+          horizontal
+          style={{marginTop: 15}}
+        />
+      </ScrollView>
     </>
   )
 }

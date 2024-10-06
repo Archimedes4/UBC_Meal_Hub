@@ -182,7 +182,7 @@ export default function FoodPage() {
     );
   }
   return (
-    <View>
+    <View style={{width, height}}>
       <Text>Something Went Wrong</Text>
     </View>
   )
