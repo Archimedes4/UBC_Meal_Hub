@@ -18,9 +18,9 @@ export default function FoodComponent({
       height: 2.5
     }}}>
       <Image source={food.image} style={{width, height: height}}/>
-      <BlurView style={{width, height: height * 0.2, flexDirection: 'row', justifyContent: 'space-between', padding: 5, position: 'absolute', bottom: 0}}>
-        <Text style={{fontWeight: 'bold', fontSize: 20}}>{food.name}</Text>
-        {(food.rating_count !== 0) && <Text style={{fontWeight: 'bold'}}>{food.rating_sum/food.rating_count}</Text>}
+      <BlurView style={{width, height: height * 0.2, flexDirection: 'row', justifyContent: 'space-between', padding: 5, position: 'absolute', bottom: 0, paddingTop: (height < 150) ? 0:undefined}}>
+        <Text style={{fontWeight: 'bold', fontSize: 20, zIndex: 3, overflow: 'visible', height: height * 0.2, color: 'white'}}>{food.name}</Text>
+        {(food.rating_count !== 0) && <Text style={{fontWeight: 'bold', color: 'white'}}>{food.rating_sum/food.rating_count}</Text>}
       </BlurView>
     </View>
   )
