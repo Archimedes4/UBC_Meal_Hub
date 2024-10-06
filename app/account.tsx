@@ -106,9 +106,9 @@ function PaymentDropdown() {
           <DropdownItem text='Departmental Food Plan'onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
           <DropdownItem text='Carryover Plan' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
           <DropdownItem text='UBC Guest Cards' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
-          <DropdownItem text='cash' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
-          <DropdownItem text='debit' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
-          <DropdownItem text='credit' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
+          <DropdownItem text='Cash' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
+          <DropdownItem text='Debit' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
+          <DropdownItem text='Credit' onSelectItem={setSelectedPayment} selectedItem={selectedPayment}/>
         </View>
       </Animated.View>
     </View>
