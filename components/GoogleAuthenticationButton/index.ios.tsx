@@ -9,6 +9,7 @@ import { Text } from "react-native"
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "@/functions/firebase";
+import React from "react";
 
 export default function GoogleAuthenticationButton() {
   const {width} = useWindowDimensions()
@@ -32,9 +33,9 @@ export default function GoogleAuthenticationButton() {
         borderRadius: 4,
         borderColor: "black",
         borderWidth: 1,
-        height: 700,
-        width: width * ((width <= 560) ? 0.95:0.8) - 22,
-        paddingHorizontal: 12,
+        height: 50,
+        width: Math.min(500, width - 30),
+        paddingHorizontal: 15,
         marginTop: 5,
         justifyContent: 'center'
       }}
@@ -44,7 +45,7 @@ export default function GoogleAuthenticationButton() {
     >
       <View style={{flexDirection: "row", alignItems: 'center', height: 36, justifyContent: 'center'}}>
         <GoogleIcon width={20} height={20} style={{marginRight: 14, height: 36}}/>
-        <Text style={{textAlignVertical: 'center', fontSize: 14, fontFamily: 'Roboto'}}>Sign In With Google</Text>
+        <Text style={{textAlignVertical: 'center', fontSize: 20}}>Sign In With Google</Text>
       </View>
     </Pressable>
   )

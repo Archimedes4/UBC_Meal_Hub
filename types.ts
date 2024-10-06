@@ -1,7 +1,8 @@
 export enum loadingStateEnum {
   loading,
   failed,
-  success
+  success,
+  notStarted
 }
 
 export enum authStateEnum {

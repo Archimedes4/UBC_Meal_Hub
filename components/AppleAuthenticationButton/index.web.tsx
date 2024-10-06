@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 import AppleSignin from 'react-apple-signin-auth';
 import { auth } from '../../functions/firebase'
 import { sha256 } from 'js-sha256';
+import React from 'react';
 
 /** Apple Signin button */
 export default function AppleAuthenticationButton() {

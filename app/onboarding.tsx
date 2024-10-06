@@ -2,25 +2,30 @@
 Profile form
 Quy Duong Nguyen
 */
+import LoadingScreen from '@/components/LoadingScreen';
 import UserImage from '@/components/UserImage';
 import { auth, db } from '@/functions/firebase';
-import { colors } from '@/types';
+import useAuth from '@/hooks/useAuth';
+import { authStateEnum, colors, loadingStateEnum } from '@/types';
+import { Redirect } from 'expo-router';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, FlatList, Alert, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 
 
 function ProfileIcon({index, setIndex, selectedIndex}:{index: number; setIndex: (index: number) => void, selectedIndex: number}) {
+  const {width} = useWindowDimensions()
+  const BOX = 120
   if (selectedIndex === index) {
     return (
-      <Pressable onPress={() => {setIndex(index)}} style={{borderRadius: 100, overflow: 'hidden', borderWidth: 5, width: 150, height: 150, marginHorizontal: 'auto', justifyContent: 'center'}}>
-        <UserImage index={index} length={140}/>
+      <Pressable onPress={() => {setIndex(index)}} style={{borderRadius: 100, overflow: 'hidden', borderWidth: 5, width: (width <= 576) ? BOX:150, height: (width <= 576) ? BOX:150, marginHorizontal: 'auto', justifyContent: 'center', marginVertical: 'auto'}}>
+        <UserImage index={index} length={(width <= 576) ? (BOX * 0.93):140}/>
       </Pressable>
     )
   }
   return (
-    <Pressable onPress={() => {setIndex(index)}} style={{borderRadius: 100, overflow: 'hidden', width: 150, height: 150, marginHorizontal: 'auto', justifyContent: 'center', marginVertical: 'auto'}}>
-      <UserImage index={index} length={150} style={{width: 120, height: 120}} viewStyle={{width: 150, height: 150}}/>
+    <Pressable onPress={() => {setIndex(index)}} style={{borderRadius: 100, overflow: 'hidden', width: (width <= 576) ? BOX:150, height: (width <= 576) ? BOX:150, marginHorizontal: 'auto', justifyContent: 'center', marginVertical: 'auto'}}>
+      <UserImage index={index} length={(width <= 576) ? BOX:150} style={{width: (width <= 576) ? (BOX * 0.8):120, height: (width <= 576) ? (BOX * 0.8):120}} viewStyle={{width: 150, height: 150}}/>
     </Pressable>
   )
 }
@@ -32,6 +37,8 @@ export default function ProfileForm() {
   const [email, setEmail] = useState('');
   const [selectedProfile, setSelectedProfile] = useState<number>(3);
   const {width} = useWindowDimensions()
+  const [submitState, setSubmitState] = useState<loadingStateEnum>(loadingStateEnum.notStarted);
+  const {authState} = useAuth();
 
   // Handle form submission
   async function handleSubmit() {
@@ -55,6 +62,14 @@ export default function ProfileForm() {
     }
   };
 
+  if (authState === authStateEnum.loading) {
+    return <LoadingScreen />
+  }
+
+  if (authState !== authStateEnum.noAccount) {
+    return <Redirect href={'/account'}/>
+  }
+
   return (
     <ScrollView contentContainerStyle={{
       flexGrow: 1,
@@ -71,6 +86,7 @@ export default function ProfileForm() {
         placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
+        placeholderTextColor={'black'}
       />
 
       {/* Last Name Input */}
@@ -79,6 +95,7 @@ export default function ProfileForm() {
         placeholder="Last Name"
         value={lastName}
         onChangeText={setLastName}
+        placeholderTextColor={'black'}
       />
 
       {/* Email Input */}
@@ -88,6 +105,7 @@ export default function ProfileForm() {
         value={email}
         keyboardType="email-address"
         onChangeText={setEmail}
+        placeholderTextColor={'black'}
       />
 
       <Text style={styles.subtitle}>Choose 1 Picture</Text>

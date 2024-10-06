@@ -13,7 +13,7 @@ export default function GoogleProvider({
 }) {
   useEffect(() => {
     GoogleSignin.configure({
-      iosClientId: '94813812988-lhtl01ojo9jchu3h8sbvr97uk9p1ajum.apps.googleusercontent.com'
+      iosClientId: '641900113874-7m9f451q8h1ehqiselhcvea4ak0e56ea.apps.googleusercontent.com'
     });  
   }, [])
   return children

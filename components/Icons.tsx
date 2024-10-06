@@ -64,7 +64,7 @@ export function ChevronLeft({
 }) {
   return (
     <Svg viewBox="0 0 24 24" fill="none" width={width} height={height} style={style}>
-      <Path d="M15 6L9 12L15 18" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <Path d="M15 6L9 12L15 18" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </Svg>
   )
 }

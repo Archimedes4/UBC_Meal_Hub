@@ -13,6 +13,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useAuth from '@/hooks/useAuth';
 import LoadingScreen from '@/components/LoadingScreen';
 import UserImage from '@/components/UserImage';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/functions/firebase';
 
 function SelectResturantComponent() {
   const [resturantState, setResturantState] = useState<loadingStateEnum>(loadingStateEnum.loading)
@@ -157,7 +159,12 @@ export default function Account() {
   }
 
   if (user === null) {
-    return <Text>Something Went Wrong</Text>
+    return (
+      <View style={{top: insets.top}}>
+        <Text>Something went wrong.</Text>
+        <Pressable onPress={() => router.push("/sign-in")}><Text>Sign In</Text></Pressable>
+      </View>
+    )
   }
 
   return (
@@ -189,6 +196,12 @@ export default function Account() {
           </Animated.View>
         </View>
         <PaymentDropdown />
+        <Pressable
+          style={{height: 60, width: width - 30, marginHorizontal: 15, backgroundColor: 'white', borderRadius: 45, alignItems: 'center', justifyContent: 'center', marginTop: 15}}
+          onPress={() => signOut(auth)}
+        >
+          <Text style={{fontSize: 25, fontWeight: 'bold'}}>Sign Out</Text>
+        </Pressable>
         <Text style={{marginLeft: 15, marginTop: 15, fontWeight: 'bold', fontSize: 25}}>Favorite Foods</Text>
         <FlatList
           data={[]}
