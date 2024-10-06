@@ -1,7 +1,7 @@
 // UBC Meal Hub
 // Home page
 // Quy Duong Nguyen
-import { Image, StyleSheet, Platform, View, useWindowDimensions, Text, Pressable, FlatList, ActivityIndicator, TextInput } from 'react-native';
+import { Image, StyleSheet, Platform, View, useWindowDimensions, Text, Pressable, FlatList, ActivityIndicator, TextInput, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { getFoods } from '@/functions/food';
@@ -17,9 +17,19 @@ import UserImage from '@/components/UserImage';
 import useAuth from '@/hooks/useAuth';
 import LoadingScreen from '@/components/LoadingScreen';
 
-function SearchComponent() {
+function SearchComponent({onChange}:{onChange: (text: string) => void}) {
   const [searchQuery, setSearchQuery] = useState('');
   const {width} = useWindowDimensions()
+
+  useEffect(() => {
+    const interval = setTimeout(() => {
+      onChange(searchQuery)
+    }, 1000)
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
   return (
     <View
       style={{
@@ -78,6 +88,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets()
   const [homeScreenMode, setHomeScreenMode] = useState(homeScreenModeEnum.both)
   const {authState, user} = useAuth();
+  const [searchText, setSearchText] = useState("")
 
   if (authState === authStateEnum.loading) {
     return <LoadingScreen />
@@ -103,7 +114,7 @@ export default function HomeScreen() {
           }}
         >
           <View style={{marginVertical: 'auto'}}>
-            <Text style={{fontSize: 20, marginBottom: 2, marginVertical: 'auto'}}>{getGreeting()}</Text>
+            <Text style={{fontSize: 20, marginBottom: 2, marginVertical: 'auto', fontWeight: (authState === authStateEnum.signedIn && user !== null) ? 'regular':"bold"}}>{getGreeting()}{(authState === authStateEnum.signedIn && user !== null) ? ",":""}</Text>
             {(authState === authStateEnum.signedIn && user !== null) && (<Text style={{fontSize: 25, fontWeight: 'bold'}}>{user.firstName} {user.lastName}</Text> )}
           </View>
           <Pressable onPress={() => {
@@ -119,34 +130,41 @@ export default function HomeScreen() {
             height: height * 0.9,
           }}
         >
-          <SearchComponent />
-          {(homeScreenMode !== homeScreenModeEnum.resturant) && (
-            <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
-              <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
-              
-              <FoodMenu />
-            </View>
-          )}
-          {(homeScreenMode !== homeScreenModeEnum.resturant) && (
-            <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
-              <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Resturants</Text>
-              <ResturantMenu />
-            </View>
-          )}
+          <SearchComponent onChange={(e) => {
+            setSearchText(e)
+          }}/>
+          <ScrollView>
+            {(homeScreenMode !== homeScreenModeEnum.resturant) && (
+              <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
+                <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
+                <FoodMenu search={searchText}/>
+              </View>
+            )}
+            {(homeScreenMode !== homeScreenModeEnum.resturant) && (
+              <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60))/2}}>
+                <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Resturants</Text>
+                <ResturantMenu search={searchText}/>
+              </View>
+            )}
+          </ScrollView>
         </View>
       </View>
     </>
   );
 }
 
-function FoodMenu() {
+function FoodMenu({
+  search
+}:{
+  search: string
+}) {
   const [foodState, setFoodState] = useState(loadingStateEnum.loading)
   const [foods, setFoods] = useState<food[]>([])
   const numColumns = useNumColumns()
   const {width} = useWindowDimensions()
 
   async function loadFoods() {
-    const result = await getFoods()
+    const result = await getFoods(search)
     setFoodState(result.result)
     if (result.result === loadingStateEnum.success) {
       setFoods(result.data)
@@ -154,8 +172,16 @@ function FoodMenu() {
   }
 
   useEffect(() => {
+    setFoodState(loadingStateEnum.loading)
     loadFoods()
-  }, [])
+  }, [search])
+
+  function rows(arrIn: food[], num: number) {
+    let arr = [...arrIn]
+    const newArr = [];
+    while(arr.length) newArr.push(arr.splice(0,num));
+    return newArr
+  }
 
   if (foodState === loadingStateEnum.loading) {
     return (
@@ -167,28 +193,33 @@ function FoodMenu() {
   }
 
   return (
-    <FlatList
-      data={foods}
-      numColumns={numColumns}
-      renderItem={(food) => (
-        <Pressable onPress={() => router.push(`/restaurant/${food.item.restaurant_id}/food/${food.item.pretty}`)}>
-          <FoodComponent food={food.item} width={(width - 15)/numColumns} height={(width/numColumns) * 0.8}/>
-        </Pressable>
-      )}
-      style={{paddingRight: 15}}
-    />
+    <>
+      {rows(foods, numColumns).map((row) => (
+        <View>
+          {foods.map((food) => (
+            <Pressable onPress={() => router.push(`/restaurant/${food.restaurant_id}/food/${food.pretty}`)}>
+              <FoodComponent food={food} width={(width - 15)/numColumns} height={(width/numColumns) * 0.8}/>
+            </Pressable>
+          ))}
+        </View>
+      ))}
+    </>
   )
 }
 
 
-function ResturantMenu() {
+function ResturantMenu({
+  search
+}:{
+  search: string
+}) {
   const [resturantState, setResturantState] = useState(loadingStateEnum.loading)
   const [resturants, setResturants] = useState<resturant[]>([])
   const numColumns = useNumColumns()
   const {width} = useWindowDimensions()
 
-  async function loadFoods() {
-    const result = await getResturants()
+  async function loadResturants() {
+    const result = await getResturants(search)
     setResturantState(result.result)
     if (result.result === loadingStateEnum.success) {
       setResturants(result.data)
@@ -196,8 +227,16 @@ function ResturantMenu() {
   }
 
   useEffect(() => {
-    loadFoods()
-  }, [])
+    setResturantState(loadingStateEnum.loading)
+    loadResturants()
+  }, [search])
+
+  function rows(arrIn: resturant[], num: number) {
+    let arr = [...arrIn]
+    const newArr = [];
+    while(arr.length) newArr.push(arr.splice(0,num));
+    return newArr
+  }
 
   if (resturantState === loadingStateEnum.loading) {
     return (
@@ -209,15 +248,17 @@ function ResturantMenu() {
   }
 
   return (
-    <FlatList
-      data={resturants}
-      numColumns={numColumns}
-      style={{paddingRight: 15}}
-      renderItem={(food) => (
-        <View style={{marginLeft: 15, marginBottom: 15}}>
-          <ResturantComponent resturant={food.item} width={((width - 15)/numColumns) -15} height={(width/numColumns) * 0.8}/>
-        </View>
-      )}
-    />
+    <>
+    {rows(resturants, numColumns).map((row) => (
+      <View style={{flexDirection: 'row'}}>
+        {row.map((food) => (
+          //@ts-expect-error
+          <Pressable style={{marginLeft: 15, marginBottom: 15}} onPress={() => {router.push(`restaurant/${food.pretty}`)}}>
+            <ResturantComponent resturant={food} width={((width - 15)/numColumns) -15} height={(width/numColumns) * 0.8}/>
+          </Pressable>
+        ))}
+      </View>
+    ))}
+  </>
   )
 }
