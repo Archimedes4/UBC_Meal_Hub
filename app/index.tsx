@@ -1,9 +1,10 @@
 // UBC Meal Hub
 // Home page
 // Quy Duong Nguyen
-import { Image, StyleSheet, Platform, View, useWindowDimensions, Text } from 'react-native';
+import { Image, StyleSheet, Platform, View, useWindowDimensions, Text, Pressable } from 'react-native';
 import React, { useState } from 'react';
 import { TextInput } from 'react-native-gesture-handler';
+import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const {width, height} = useWindowDimensions();
@@ -18,10 +19,14 @@ export default function HomeScreen() {
         <Text>Good Morning,</Text>
         <Text>Andrew Mainella,</Text> 
       </View>
-      <Image
-      source={require('@/assets/images/homelander.png')}
-      style={{width: 50, height: 50, borderRadius: 25}}
-      />
+      <Pressable onPress={() => {
+        router.push("/account")
+      }}>
+        <Image
+          source={require('@/assets/images/homelander.png')}
+          style={{width: 50, height: 50, borderRadius: 25}}
+        />
+      </Pressable>
     </View>
 
     {/* Main content*/}
