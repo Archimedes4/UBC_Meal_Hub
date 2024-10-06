@@ -66,6 +66,10 @@ export default function ProfileForm() {
     return <LoadingScreen />
   }
 
+  if (auth.currentUser?.isAnonymous === true) {
+    return <Redirect href={'/'}/>
+  }
+
   if (authState !== authStateEnum.noAccount) {
     return <Redirect href={'/account'}/>
   }
