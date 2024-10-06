@@ -69,5 +69,27 @@ export async function setUserRating(foodId: string, uid: string, rating: number)
   } catch {
     return loadingStateEnum.failed
   }
+}
 
+export async function getFoods(): Promise<{
+  result: loadingStateEnum.success;
+  data: food[];
+} | {
+  result: loadingStateEnum.failed
+}> {
+  try {
+    let foods: food[] = []
+    const result = await getDocs(collection(db, "foods"))
+    result.forEach((doc) => {
+      foods.push(doc.data() as food)
+    })
+    return {
+      result: loadingStateEnum.success,
+      data: foods
+    }
+  } catch {
+    return {
+      result: loadingStateEnum.failed
+    }
+  }
 }
