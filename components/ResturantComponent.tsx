@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import {Image} from 'expo-image'
 import { BlurView } from "expo-blur";
+import React from "react";
 
 export default function ResturantComponent({
   width,
