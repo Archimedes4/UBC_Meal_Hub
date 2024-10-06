@@ -113,11 +113,11 @@ export async function getFoods(search?: string): Promise<{
 }> {
   try {
     let foods: food[] = []
-    const result = await getDocs(collection(db, "foods"))
-    let q = query(collection(db, "resturants"))
+    let q = query(collection(db, "foods"))
     if (search !== undefined && search !== "") {
-      q = query(collection(db, "resturants"), where("name", ">=", search))
+      q = query(collection(db, "foods"), where("name", ">=", search))
     }
+    const result = await getDocs(q)
     result.forEach((doc) => {
       foods.push(doc.data() as food)
     })

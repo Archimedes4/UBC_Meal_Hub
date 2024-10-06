@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import UserImage from '@/components/UserImage';
 import useAuth from '@/hooks/useAuth';
 import LoadingScreen from '@/components/LoadingScreen';
+import { ChevronDown, ChevronUp } from '@/components/Icons';
 
 function SearchComponent({onChange}:{onChange: (text: string) => void}) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,11 +25,11 @@ function SearchComponent({onChange}:{onChange: (text: string) => void}) {
   useEffect(() => {
     const interval = setTimeout(() => {
       onChange(searchQuery)
-    }, 1000)
+    }, 500)
     return () => {
       clearInterval(interval)
     }
-  }, [])
+  }, [searchQuery])
 
   return (
     <View
@@ -91,6 +92,7 @@ export default function HomeScreen() {
   const [homeScreenMode, setHomeScreenMode] = useState(homeScreenModeEnum.both)
   const {authState, user} = useAuth();
   const [searchText, setSearchText] = useState("")
+  const [isShowingMore, setIsShowingMore] = useState(false)
 
   if (authState === authStateEnum.loading) {
     return <LoadingScreen />
@@ -137,10 +139,7 @@ export default function HomeScreen() {
           }}/>
           <ScrollView style={{height: (height * 0.9) - (insets.top + insets.bottom + 60), width}}>
             {(homeScreenMode !== homeScreenModeEnum.resturant) && (
-              <View style={{height: (height * 0.9 - (insets.top + insets.bottom + 60)) * 0.8}}>
-                <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
-                <FoodMenu search={searchText}/>
-              </View>
+              <FoodMenu isShowingMore={isShowingMore} setIsShowingMore={setIsShowingMore} search={searchText}/>
             )}
             {(homeScreenMode !== homeScreenModeEnum.resturant) && (
               <View>
@@ -157,19 +156,25 @@ export default function HomeScreen() {
 }
 
 function FoodMenu({
-  search
+  search,
+  isShowingMore,
+  setIsShowingMore
 }:{
   search: string
+  isShowingMore: boolean
+  setIsShowingMore: (isShowingMore: boolean) => void
 }) {
   const [foodState, setFoodState] = useState(loadingStateEnum.loading)
   const [foods, setFoods] = useState<food[]>([])
   const numColumns = useNumColumns()
-  const {width} = useWindowDimensions()
+  const {width, height} = useWindowDimensions()
+  const insets = useSafeAreaInsets()
 
   async function loadFoods() {
     const result = await getFoods(search)
     setFoodState(result.result)
     if (result.result === loadingStateEnum.success) {
+      console.log(result.data)
       setFoods(result.data)
     }
   }
@@ -195,10 +200,15 @@ function FoodMenu({
     )
   }
 
+  if (foods.length === 0) {
+    return null
+  }
+
   return (
-    <>
-      {rows(foods, numColumns).map((row) => (
-        <View>
+    <View style={{height: (isShowingMore || foods.length <= (numColumns * 2)) ? "auto":(height * 0.9 - (insets.top + insets.bottom + 60)) * 0.8}}>
+      <Text style={{marginLeft: 15, marginVertical: 5, fontWeight: 'bold', fontSize: 25}}>Foods</Text>
+      {rows(foods.slice(0, (isShowingMore) ? foods.length:3), numColumns).map((row) => (
+        <View style={{flexDirection: 'row', marginBottom: 15}}>
           {foods.map((food) => (
             <Pressable onPress={() => router.push(`/restaurant/${food.restaurant_id}/food/${food.pretty}`)}>
               <FoodComponent food={food} width={(width - 15)/numColumns} height={(width/numColumns) * 0.8}/>
@@ -206,7 +216,17 @@ function FoodMenu({
           ))}
         </View>
       ))}
-    </>
+      {isShowingMore ?
+        <Pressable style={{flexDirection: 'row', marginHorizontal: 'auto'}} onPress={() => setIsShowingMore(false)}>
+          <ChevronUp width={25} height={25}/>
+          <Text style={{marginVertical: 'auto'}}>Show Less</Text>
+        </Pressable>:
+        <Pressable style={{flexDirection: 'row', marginHorizontal: 'auto'}} onPress={() => setIsShowingMore(true)}>
+          <ChevronDown width={25} height={25}/>
+          <Text style={{marginVertical: 'auto'}}>Show More</Text>
+        </Pressable>
+      }
+    </View>
   )
 }
 
@@ -224,6 +244,7 @@ function ResturantMenu({
   async function loadResturants() {
     const result = await getResturants(search)
     setResturantState(result.result)
+    console.log(result, search)
     if (result.result === loadingStateEnum.success) {
       setResturants(result.data)
     }
