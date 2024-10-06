@@ -1,6 +1,10 @@
-import { Image, StyleSheet, Platform, View, useWindowDimensions, Text } from 'react-native';
+// UBC Meal Hub
+// Home page
+// Quy Duong Nguyen
+import { Image, StyleSheet, Platform, View, useWindowDimensions, Text, Pressable } from 'react-native';
 import React, { useState } from 'react';
 import { TextInput } from 'react-native-gesture-handler';
+import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
@@ -8,27 +12,23 @@ export default function HomeScreen() {
 
   return (
     <View>
-      {/* Top Part */}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: 16,
-          width,
-          height: height * 0.1,
-          backgroundColor: '#CAE9BB',
-        }}
-      >
-        <View>
-          <Text>Good Morning,</Text>
-          <Text>Andrew Mainella,</Text>
-        </View>
+  {/* top part */} 
+    <View style={{flexDirection: 'row', alignItems: 'center', 
+                  justifyContent: 'space-between', padding: 16, 
+                  width, height: height * 0.1, backgroundColor: "#CAE9BB"}}>
+      <View> 
+        <Text>Good Morning,</Text>
+        <Text>Andrew Mainella,</Text> 
+      </View>
+      <Pressable onPress={() => {
+        router.push("/account")
+      }}>
         <Image
           source={require('@/assets/images/homelander.png')}
-          style={{ width: 50, height: 50, borderRadius: 25 }}
+          style={{width: 50, height: 50, borderRadius: 25}}
         />
-      </View>
+      </Pressable>
+    </View>
 
       {/* Main Content */}
       <View

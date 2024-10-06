@@ -2,6 +2,8 @@ import { View, Text, TextInput, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/functions/firebase';
+import generateUUID from '@/functions/generateUUID';
+import { router } from 'expo-router';
 
 export default function resturants() {
   const [categories, setCategories] = useState<string[]>([]);
@@ -12,7 +14,11 @@ export default function resturants() {
   async function createResturant() {
     try {
       await setDoc(doc(db, "resturants", resturantName), {
-      
+        restaurant_id: generateUUID(),
+        pretty: prettyName,
+        name: resturantName,
+        image: "",
+        restaurant_categories: categories
       })
     } catch {
 
@@ -21,6 +27,9 @@ export default function resturants() {
 
   return (
     <View>
+      <Pressable onPress={() => {router.push('/')}}>
+        <Text>Back</Text>
+      </Pressable>
       <Text>resturants</Text>
       <Text>Resturant Name</Text>
       <TextInput value={resturantName} onChangeText={setResturantName}/>
@@ -42,7 +51,7 @@ export default function resturants() {
           </View>
         )
       })}
-      <Pressable>
+      <Pressable onPress={() => {createResturant()}}>
         <Text>Create Resturant</Text>
       </Pressable>
     </View>

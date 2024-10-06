@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 export default function useAuth() {
   const [user, setUser] = useState(null);
   const [authState, setAuthState] = useState(authStateEnum.loading);
+  const [uid, setUid] = useState<string>("")
 
   useEffect(() => {
     // Check if the user is signed in
@@ -22,6 +23,7 @@ export default function useAuth() {
         console.log("No user signed in");
         setAuthState(authStateEnum.noAuth)
       } else {
+        setUid(data.uid)
         setUser(null); // TODO get user data
         setAuthState(authStateEnum.signedIn)
       }
@@ -30,5 +32,5 @@ export default function useAuth() {
     return () => sub();
   }, []);
 
-  return { user, authState };
+  return { user, authState, uid };
 }

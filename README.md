@@ -12,6 +12,7 @@ image: string
 #### Foods
 ![Note]Rating is the rating_sum/rating_count
 food_id: string
+pretty: string this can have duplicates just needs to be unique to the restuant
 name: string
 rating_sum: number is the sum of sum(Itams/Stars/rating)
 rating_count: is the cound of count(Itams/Stars)
