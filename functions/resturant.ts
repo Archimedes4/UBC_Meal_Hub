@@ -1,5 +1,5 @@
 import { loadingStateEnum, resturantStateEnum } from "@/types";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "./firebase";
 
 /**
@@ -20,6 +20,27 @@ export async function getResturantPretty(pretty: string): Promise<{
       }
     }
     return {result: resturantStateEnum.notFound}
+  } catch {
+    return {result: resturantStateEnum.failed}
+  }
+}
+
+/**
+ * Gets a resturant given a id
+ */
+export async function getResturant(id: string): Promise<{
+  result: resturantStateEnum.success,
+  data: resturant
+} | {
+  result: resturantStateEnum.failed | resturantStateEnum.notFound
+}> {
+  try {
+    const result = await getDoc(doc(db, "resturants", id))
+    if (!result.exists()) {
+      return {result: resturantStateEnum.notFound}
+    }
+    const data = result.data()
+    return {result: resturantStateEnum.success, data: data as resturant}
   } catch {
     return {result: resturantStateEnum.failed}
   }

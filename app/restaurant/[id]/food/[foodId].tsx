@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Pressable, useWindowDimensions, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, Alert } from 'react-native';
 import { ChevronLeft, HeartIcon, StarIcon } from '../../../../components/Icons';
 import { foodStateEnum, loadingStateEnum } from '@/types';
 import LoadingScreen from '@/components/LoadingScreen';
@@ -8,6 +8,7 @@ import { router, useGlobalSearchParams } from 'expo-router';
 import useAuth from '@/hooks/useAuth';
 import Head from 'expo-router/head';
 import { addHeart, removeHeart } from '@/functions/hearts';
+import { auth } from '@/functions/firebase';
 
 function StarComponent({rating, foodId, uid, hoverRating, setHoverRating}:{
   rating: number
@@ -20,7 +21,13 @@ function StarComponent({rating, foodId, uid, hoverRating, setHoverRating}:{
 
   async function loadRateFood() {
     // Rate the food
+    console.log(foodId, uid, rating)
     const result = await setUserRating(foodId, uid, rating);
+    if (result !== loadingStateEnum.success) {
+      Alert.alert('Something went wrong. Please try again.')
+    } else {
+      console.log("Rated food")
+    }
   }
 
   return (
@@ -44,11 +51,13 @@ function HeartComponent({
   food: food
 }) {
   const [heartState, setHeartState] = useState(loadingStateEnum.success)
-  const {uid} = useAuth()
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    setIsFavorite(food.hearts.includes(uid))
+    const uid = auth.currentUser?.uid
+    if (uid !== undefined) {
+      setIsFavorite(food.hearts.includes(uid))
+    }
   }, [])
 
   return (
@@ -154,12 +163,12 @@ export default function FoodPage() {
             marginBottom: 16,
             marginLeft: 15
           }}>
-            {(food.rating_sum !== 0) && <Text style={{
+            {(food.rating_count !== 0) && <Text style={{
               fontSize: 56,
               marginRight: 8,
               fontWeight: 'bold',
               color: "white"
-            }} numberOfLines={1}>{Math.round(food.rating_count/food.rating_sum * 100)/100}</Text>}
+            }} numberOfLines={1}>{Math.round(food.rating_sum/food.rating_count * 100)/100}</Text>}
             <View style={styles.starsContainer}>
               <StarComponent rating={1} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />
               <StarComponent rating={2} foodId={food.food_id} uid={uid} hoverRating={hoverRating} setHoverRating={setHoverRating} />

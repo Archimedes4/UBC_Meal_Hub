@@ -13,7 +13,10 @@ export default function FoodComponent({
   height: number
 }) {
   return (
-    <View style={{width: width - 15, height, borderRadius: 25, overflow: 'hidden', borderWidth: 3, borderColor: 'black', marginLeft: 15}}>
+    <View style={{width: width - 15, height, borderRadius: 5, overflow: 'hidden', borderColor: 'black', marginLeft: 15, shadowRadius: 5, shadowColor: 'black', shadowOffset: {
+      width: 2.5,
+      height: 2.5
+    }}}>
       <Image source={food.image} style={{width, height: height}}/>
       <BlurView style={{width, height: height * 0.2, flexDirection: 'row', justifyContent: 'space-between', padding: 5, position: 'absolute', bottom: 0}}>
         <Text style={{fontWeight: 'bold', fontSize: 20}}>{food.name}</Text>
