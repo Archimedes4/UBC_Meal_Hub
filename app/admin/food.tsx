@@ -1,11 +1,53 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, TextInput, Button, Image, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { doc, setDoc } from 'firebase/firestore';
+import generateUUID from '@/functions/generateUUID';
+import { db } from '@/functions/firebase';
+import { loadingStateEnum } from '@/types';
+import { getResturants } from '@/functions/resturant';
+
+function ResturantList({
+  setSelectedResturant
+}:{
+  setSelectedResturant: (resturant: resturant) => void
+}) {
+  const [resturants, setResturants] = useState<resturant[]>([])
+
+  async function loadResturants() {
+    // Fetch resturants from the backend
+    const resturants = await getResturants()
+    console.log(resturants)
+    if (resturants.result === loadingStateEnum.success) {
+      setResturants(resturants.data)
+    }
+  }
+
+  useEffect(() => {
+    loadResturants()
+  }, [])
+
+  return (
+    <View>
+      <Text>Resturant List</Text>
+      {resturants.map(resturant => (
+        <Pressable key={resturant.restaurant_id} onPress={() => {
+          setSelectedResturant(resturant)
+        }}>
+          <Text>{resturant.pretty}</Text>
+        </Pressable>)
+      )}
+      <Text>Categories</Text>
+    </View>
+  )
+}
 
 export default function AdminAddFoodScreen() {
   const [foodName, setFoodName] = useState('');
-  const [description, setDescription] = useState('');
+  const [prettyName, setPrettyName] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [selectedResturant, setSelectedResturant] = useState<resturant | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -23,18 +65,25 @@ export default function AdminAddFoodScreen() {
   };
 
   // Function to handle adding food (could integrate backend API here)
-  const handleAddFood = () => {
+  async function addFood() {
     if (foodName && imageUri) {
       // For now, log the data (can add the backend API call here)
-      console.log('Food added:', {
+      const id = generateUUID()
+      await setDoc(doc(db, "foods", id), {
+        food_id: id,
+        pretty: prettyName,
         name: foodName,
-        description: description,
-        image: imageUri,
-      });
-
+        rating_sum: 0,
+        rating_count: 0,
+        hearts: [],
+        ingredients: [],
+        image: "",
+        date: new Date().getTime(),
+        restaurant_id: selectedResturant?.restaurant_id,
+        category: selectedCategory
+      })
       // Reset form after submission
       setFoodName('');
-      setDescription('');
       setImageUri(null);
     } else {
       alert('Please enter the food name and select an image.');
@@ -53,14 +102,24 @@ export default function AdminAddFoodScreen() {
         style={styles.input}
       />
 
-      {/* Input for description (optional) */}
       <TextInput
-        placeholder="Description (optional)"
-        value={description}
-        onChangeText={setDescription}
-        style={[styles.input, { height: 80 }]} // Higher input box for description
-        multiline
+        placeholder="Pretty Name"
+        value={prettyName}
+        onChangeText={setPrettyName}
+        style={styles.input}
       />
+
+      <ResturantList setSelectedResturant={(e) => {
+        setSelectedResturant(e)
+      }}/>
+
+      {selectedResturant && (selectedResturant.restaurant_categories.map(category => (
+        <Pressable onPress={() => {
+          setSelectedCategory(category)
+        }}>
+          <Text>{category}</Text>
+        </Pressable>
+      )))}
 
       {/* Button to pick an image */}
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
@@ -73,7 +132,9 @@ export default function AdminAddFoodScreen() {
       )}
 
       {/* Button to submit the food */}
-      <Button title="Add Food" onPress={handleAddFood} />
+      {(selectedResturant !== null && selectedCategory !== "" && prettyName !== "") &&
+       <Button title="Add Food" onPress={addFood} />
+      }
     </View>
   );
 }

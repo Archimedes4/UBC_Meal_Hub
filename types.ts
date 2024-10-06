@@ -17,6 +17,13 @@ export enum resturantStateEnum {
   notFound
 }
 
+export enum foodStateEnum {
+  loading,
+  failed,
+  success,
+  notFound
+}
+
 declare global {
   type ingredient = {
     ingredient_id: string;
